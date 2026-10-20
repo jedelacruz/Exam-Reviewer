@@ -1,0 +1,867 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>SQA Reviewer, Lessons 1–7</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: sticky mode bar (Notes / Practice / Memorize); notes = lesson rail + reading column; practice = format tabs + question cards stamped PASS/FAIL like a test log */
+:root{
+  --bg:#f2f4f3; --surface:#ffffff; --fg:#17211f; --muted:#5b6865; --line:#d6dddb;
+  --accent:#0d5c55; --accent-ink:#ffffff; --accent-soft:#dcece9;
+  --mark:#fde58a; --mark-fg:#17211f;
+  --pass:#1f7a3d; --pass-soft:#e1f2e6; --fail:#b3261e; --fail-soft:#fbe4e2; --warn:#8a5a00; --warn-soft:#fbf0d4;
+  --f-display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body:"IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --f-mono:"IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#111816; --surface:#18211f; --fg:#e4ecea; --muted:#9aa9a5; --line:#2c3a37;
+  --accent:#5cc3b6; --accent-ink:#0b1513; --accent-soft:#1d3532;
+  --mark:#6b5a12; --mark-fg:#fff6cf;
+  --pass:#6fd08f; --pass-soft:#173323; --fail:#ff8a80; --fail-soft:#3b1a18; --warn:#f0c062; --warn-soft:#352a10;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#111816; --surface:#18211f; --fg:#e4ecea; --muted:#9aa9a5; --line:#2c3a37;
+  --accent:#5cc3b6; --accent-ink:#0b1513; --accent-soft:#1d3532;
+  --mark:#6b5a12; --mark-fg:#fff6cf;
+  --pass:#6fd08f; --pass-soft:#173323; --fail:#ff8a80; --fail-soft:#3b1a18; --warn:#f0c062; --warn-soft:#352a10;
+  color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:16px;line-height:1.6}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--surface)}
+.wrap{max-width:1120px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+header.top{padding-block:28px 18px}
+.eyebrow{font-family:var(--f-mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+h1{font-family:var(--f-display);font-weight:800;font-size:clamp(30px,5vw,46px);line-height:1.05;margin:6px 0 10px;text-wrap:balance}
+.lede{color:var(--muted);max-width:62ch;margin:0}
+.formats{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.chip{font-family:var(--f-mono);font-size:12px;padding:3px 10px;border:1px solid var(--line);border-radius:999px;background:var(--surface);color:var(--muted)}
+nav.modes{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--surface);border-bottom:1px solid var(--line)}
+nav.modes .wrap{display:flex;gap:4px;overflow-x:auto}
+.mode-btn{appearance:none;border:0;background:none;color:var(--muted);font:600 15px var(--f-body);padding:14px 14px 12px;border-bottom:3px solid transparent;cursor:pointer;white-space:nowrap}
+.mode-btn[aria-selected="true"]{color:var(--fg);border-bottom-color:var(--accent)}
+.mode-btn:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+main{padding-block:24px 64px}
+
+/* Notes */
+.notes{display:grid;grid-template-columns:200px minmax(0,1fr);gap:32px;align-items:start}
+.rail{position:sticky;top:calc(env(safe-area-inset-top,0px) + 64px);display:flex;flex-direction:column;gap:2px}
+.rail a{color:var(--muted);text-decoration:none;font-size:14px;padding:6px 10px;border-radius:6px;line-height:1.3}
+.rail a:hover{background:var(--accent-soft);color:var(--fg)}
+.rail b{font-family:var(--f-mono);font-weight:500;color:var(--accent);margin-right:6px}
+.lesson{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:24px clamp(16px,3vw,32px);margin-bottom:24px;scroll-margin-top:72px}
+.lesson h2{font-family:var(--f-display);font-weight:800;font-size:clamp(22px,3vw,28px);line-height:1.15;margin:0 0 4px;text-wrap:balance}
+.lesson .ln{font-family:var(--f-mono);font-size:12px;color:var(--accent);letter-spacing:.08em;text-transform:uppercase}
+.lesson h3{font-family:var(--f-display);font-weight:600;font-size:18px;margin:26px 0 8px;padding-top:14px;border-top:1px solid var(--line)}
+.lesson p{margin:8px 0;max-width:72ch}
+.lesson ul,.lesson ol{margin:6px 0 10px;padding-left:22px;max-width:72ch}
+.lesson li{margin:3px 0}
+mark,.k{background:var(--mark);color:var(--mark-fg);padding:0 3px;border-radius:2px}
+.tbl{overflow-x:auto;margin:10px 0 14px}
+table{border-collapse:collapse;width:100%;font-size:14px;min-width:520px}
+th,td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+th{background:var(--accent-soft);font-weight:600}
+.tip{border-left:3px solid var(--warn);background:var(--warn-soft);padding:10px 14px;border-radius:0 6px 6px 0;margin:12px 0;font-size:15px;max-width:72ch}
+.tip strong{color:var(--warn)}
+.mono{font-family:var(--f-mono);font-size:.92em}
+
+/* Practice */
+.ptabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px}
+.ptab{appearance:none;border:1px solid var(--line);background:var(--surface);color:var(--fg);font:600 14px var(--f-body);padding:8px 14px;border-radius:999px;cursor:pointer}
+.ptab[aria-selected="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.ptab .n{font-family:var(--f-mono);font-weight:500;opacity:.75;margin-left:4px}
+.board{display:flex;flex-wrap:wrap;align-items:center;gap:12px 20px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 18px;margin-bottom:18px}
+.score{font-family:var(--f-display);font-weight:800;font-size:28px;font-variant-numeric:tabular-nums}
+.score small{font-family:var(--f-body);font-weight:400;font-size:14px;color:var(--muted);margin-left:6px}
+.bar{flex:1 1 160px;height:8px;background:var(--line);border-radius:99px;overflow:hidden;min-width:120px}
+.bar i{display:block;height:100%;width:0;background:var(--accent);transition:width .3s}
+.btn{appearance:none;border:1px solid var(--line);background:var(--surface);color:var(--fg);font:600 14px var(--f-body);padding:8px 14px;border-radius:8px;cursor:pointer}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.qlist{display:flex;flex-direction:column;gap:14px}
+.q{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px 18px;position:relative}
+.q .qn{font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+.q .qt{font-weight:500;margin:4px 0 12px;padding-right:64px}
+.stamp{position:absolute;top:14px;right:14px;font-family:var(--f-mono);font-size:11px;letter-spacing:.08em;padding:2px 8px;border-radius:4px;border:1.5px solid}
+.stamp.pass{color:var(--pass);border-color:var(--pass)}
+.stamp.fail{color:var(--fail);border-color:var(--fail)}
+.opts{display:grid;gap:8px}
+.opt{appearance:none;text-align:left;border:1px solid var(--line);background:var(--bg);color:var(--fg);font:15px/1.4 var(--f-body);padding:10px 12px;border-radius:8px;cursor:pointer;display:flex;gap:10px}
+.opt .L{font-family:var(--f-mono);color:var(--muted)}
+.opt:hover:not(:disabled){border-color:var(--accent)}
+.opt:disabled{cursor:default}
+.opt.right{background:var(--pass-soft);border-color:var(--pass)}
+.opt.wrong{background:var(--fail-soft);border-color:var(--fail)}
+.tf{display:flex;gap:8px;flex-wrap:wrap}
+.tf .opt{flex:0 1 140px;justify-content:center}
+.why{margin-top:10px;font-size:14.5px;color:var(--muted);border-top:1px dashed var(--line);padding-top:8px}
+.why b{color:var(--fg)}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.row input{flex:1 1 220px;min-width:0}
+input[type=text],textarea{font:15px var(--f-body);color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:9px 12px;width:100%}
+textarea{min-height:120px;resize:vertical;line-height:1.5}
+.hint{font-size:13px;color:var(--muted);margin:0 0 8px}
+.enum-res{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.it{font-size:13.5px;padding:3px 9px;border-radius:6px;border:1px solid}
+.it.got{color:var(--pass);border-color:var(--pass);background:var(--pass-soft)}
+.it.miss{color:var(--fail);border-color:var(--fail);background:var(--fail-soft)}
+
+/* Memorize */
+.memo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px 18px;min-width:0}
+.card h4{font-family:var(--f-display);font-weight:600;font-size:16px;margin:0 0 2px}
+.card .src{font-family:var(--f-mono);font-size:11px;color:var(--accent);letter-spacing:.06em;text-transform:uppercase}
+.card ol,.card ul{margin:8px 0 0;padding-left:22px;font-size:15px}
+.facts{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px;margin-bottom:22px}
+.fact{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.fact .v{font-family:var(--f-display);font-weight:800;font-size:24px;line-height:1.1;color:var(--accent)}
+.fact .d{font-size:14px;color:var(--muted)}
+.sec-h{font-family:var(--f-display);font-weight:800;font-size:22px;margin:4px 0 12px}
+
+@media (max-width:760px){
+  .notes{grid-template-columns:1fr}
+  .rail{position:static;flex-direction:row;flex-wrap:wrap;gap:6px}
+  .rail a{border:1px solid var(--line);background:var(--surface)}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<header class="top"><div class="wrap">
+  <div class="eyebrow">Software Quality Assurance · BSIT</div>
+  <h1>SQA Reviewer, Lessons 1–7</h1>
+  <p class="lede">Read the notes, drill the lists, then take the practice test. Highlighted words are the ones most likely to show up as identification answers.</p>
+  <div class="formats"><span class="chip">Multiple choice</span><span class="chip">True / False</span><span class="chip">Enumeration</span><span class="chip">Identification</span></div>
+</div></header>
+
+<nav class="modes" aria-label="Reviewer sections"><div class="wrap" role="tablist">
+  <button class="mode-btn" role="tab" id="m-notes" aria-selected="true" data-mode="notes">Notes</button>
+  <button class="mode-btn" role="tab" id="m-memo" aria-selected="false" data-mode="memo">Must memorize</button>
+  <button class="mode-btn" role="tab" id="m-practice" aria-selected="false" data-mode="practice">Practice test</button>
+</div></nav>
+
+<main class="wrap">
+
+<!-- ===================== NOTES ===================== -->
+<section id="v-notes">
+<div class="notes">
+<nav class="rail" aria-label="Lessons">
+  <a href="#L1"><b>01</b>Software Quality &amp; SQA</a>
+  <a href="#L2"><b>02</b>Quality Models &amp; Standards</a>
+  <a href="#L3"><b>03</b>SDLC &amp; Role of QA</a>
+  <a href="#L4"><b>04</b>Fundamentals of Testing</a>
+  <a href="#L5"><b>05</b>Levels of Testing</a>
+  <a href="#L6"><b>06</b>Black-Box Techniques</a>
+  <a href="#L7"><b>07</b>Test Documentation</a>
+</nav>
+<div>
+
+<article class="lesson" id="L1">
+<div class="ln">Lesson 1</div>
+<h2>Introduction to Software Quality and SQA</h2>
+<p><mark>Software quality</mark> is the degree to which a software product meets specified requirements (explicit or implicit) and satisfies the needs and expectations of its users and stakeholders.</p>
+
+<h3>Three views of quality</h3>
+<div class="tbl"><table>
+<tr><th>Who</th><th>Definition</th><th>Remember</th></tr>
+<tr><td><b>Philip B. Crosby</b> (1926–2001), American</td><td><mark>Conformance to requirements</mark>: good quality if it does exactly what its specification says.</td><td>Wrote <i>“Quality Is Free”</i>; promoted <mark>zero defects</mark>; <b>prevention over inspection</b>. Quote: “Quality is not an act, it is a habit.”</td></tr>
+<tr><td><b>Joseph M. Juran</b> (1904–2008), Romanian-American</td><td><mark>Fitness for use</mark>: must actually work well for the people who use it.</td><td>Wrote <i>Juran's Quality Control Handbook</i>; <mark>Juran Trilogy</mark> = quality planning, quality control, quality improvement; <b>vital few and trivial many</b>; <mark>Pareto principle (80/20 rule)</mark>. Quote: “Quality is not by chance; it must be planned.”</td></tr>
+<tr><td><b>ISO</b></td><td>Fulfills <b>inherent characteristics</b></td><td>ISO = <b>International Organization for Standardization</b></td></tr>
+</table></div>
+<div class="tip"><strong>Example to know:</strong> A hospital records system can satisfy every line of its SRS (Crosby: conforms) yet be “low quality” if nurses find it confusing and slow during emergencies (Juran: poor fitness for use). Good quality needs both.</div>
+
+<h3>Quality is multi-dimensional (6)</h3>
+<ul>
+<li><b>Functionality</b> – does what it is supposed to do</li>
+<li><b>Reliability</b> – works well without crashing or failing</li>
+<li><b>Usability</b> – people can learn and use it easily</li>
+<li><b>Efficiency</b> – uses memory, speed and computer power well</li>
+<li><b>Maintainability</b> – developers can fix bugs and update code easily</li>
+<li><b>Security</b> – data stays safe from threats and outside attacks</li>
+</ul>
+
+<h3>SQA and ISO standards</h3>
+<ul>
+<li><mark>ISO 9001</mark> – quality management systems, process control, continual improvement.</li>
+<li><mark>ISO/IEC 25010</mark> – software product quality characteristics (reliability, usability, security, maintainability…).</li>
+<li>ISO-based SQA emphasizes planning, reviews, documentation, traceability, and corrective action.</li>
+</ul>
+
+<h3>QA vs QC vs Testing</h3>
+<div class="tbl"><table>
+<tr><th></th><th>Quality Assurance (QA)</th><th>Quality Control (QC)</th><th>Software Testing</th></tr>
+<tr><td>Orientation</td><td><mark>Process-oriented</mark></td><td><mark>Product-oriented</mark></td><td>Technical activity <b>under QC</b></td></tr>
+<tr><td>Goal</td><td><b>Prevents</b> defects</td><td><b>Detects</b> defects</td><td>Executes software to find defects</td></tr>
+<tr><td>Asks</td><td>“Are we following the right process to build quality software?”</td><td>“Does the software we built meet the required quality standards?”</td><td>“Is the software working correctly?”</td></tr>
+<tr><td>When</td><td>Throughout development</td><td>During/after development activities</td><td>When code can run</td></tr>
+<tr><td>Example</td><td>Coding standards, peer-review checklist, code review process</td><td>Reviewer inspecting a finished module against the checklist</td><td>Running the module with sample inputs; finding a login bug</td></tr>
+</table></div>
+
+<h3>Verification vs Validation</h3>
+<div class="tbl"><table>
+<tr><th>Verification</th><th>Validation</th></tr>
+<tr><td>“Are we building the product <mark>RIGHT</mark>?”</td><td>“Are we building the <mark>RIGHT product</mark>?”</td></tr>
+<tr><td>Checks conformance to specifications and design documents</td><td>Checks that it meets the user's real needs and expectations</td></tr>
+<tr><td>Reviews, walkthroughs, inspections; <b>no code execution</b> (static)</td><td><b>Dynamic testing</b> that executes the software</td></tr>
+<tr><td>“Does this match what was specified?”</td><td>“Does this solve the user's actual problem?”</td></tr>
+<tr><td>Ex: reviewing the SRS and design document against the client's proposal before coding</td><td>Ex: end-users doing User Acceptance Testing (UAT)</td></tr>
+</table></div>
+
+<h3>Cost of Quality (COQ)</h3>
+<p>A method of measuring the total cost of quality-related efforts and deficiencies, grouped into <b>four categories</b>:</p>
+<ol>
+<li><mark>Prevention costs</mark> – prevent defects before they happen (training, quality planning, requirements review).</li>
+<li><mark>Appraisal costs</mark> – detect defects through evaluation (testing, inspections, code reviews).</li>
+<li><mark>Internal failure costs</mark> – defects found <b>before</b> delivery (rework, re-testing, debugging).</li>
+<li><mark>External failure costs</mark> – defects found <b>after</b> delivery (warranty claims, customer support, reputation damage, legal liability). <b>Almost always the most expensive.</b></li>
+</ol>
+<div class="tip"><strong>Defect cost escalation:</strong> ₱100 to fix during requirements review → ₱1,500 during system testing → ₱15,000 after shipping to customers. The later a defect is found, the more it costs.</div>
+<div class="tip"><strong>Sample classification:</strong> Nightly automated regression tests = <b>Testing</b>, <b>Validation</b> (code is executed), <b>Appraisal cost</b> (money spent to detect).</div>
+</article>
+
+<article class="lesson" id="L2">
+<div class="ln">Lesson 2</div>
+<h2>Software Quality Models and Standards</h2>
+<p>Quality models give everyone a shared, measurable vocabulary. Two groups:</p>
+<ul>
+<li><b>Product quality</b> (judges the finished software): <mark>McCall's Model</mark>, <mark>ISO/IEC 25010:2023</mark></li>
+<li><b>Process &amp; organizational quality</b> (judges how it is built): <mark>CMMI</mark>, <mark>ISO 9001</mark></li>
+</ul>
+
+<h3>McCall's Quality Model – 11 factors</h3>
+<p>Developed in <mark>1977</mark> by <b>Jim McCall, Paul Richards, and Gene Walters</b> for the <mark>U.S. Air Force</mark> (with General Electric). One of the first structured attempts to define quality in measurable terms. Three perspectives:</p>
+<div class="tbl"><table>
+<tr><th>Category</th><th>Question</th><th>Factors</th></tr>
+<tr><td><b>Product Operation</b> (5)</td><td>“Can I use it as it is?”</td><td><mark>Correctness</mark> (right results), <mark>Efficiency</mark> (good use of hardware/memory/time), <mark>Integrity</mark> (stops unauthorized access), <mark>Reliability</mark> (keeps performing correctly over time), <mark>Usability</mark> (easy to learn and operate)</td></tr>
+<tr><td><b>Product Revision</b> (3)</td><td>“Can I fix, adapt, or improve it?”</td><td><mark>Maintainability</mark> (effort to locate and fix a bug), <mark>Flexibility</mark> (easy to change/extend), <mark>Testability</mark> (easy to write tests)</td></tr>
+<tr><td><b>Product Transition</b> (3)</td><td>“Can I move it to a new environment?”</td><td><mark>Portability</mark> (runs on another OS/device), <mark>Reusability</mark> (parts reused in other projects), <mark>Interoperability</mark> (exchanges data with other systems)</td></tr>
+</table></div>
+<div class="tip"><strong>Memory trick:</strong> Operation = <b>C-E-I-R-U</b> (“CEIRU”). Revision = <b>M-F-T</b>. Transition = <b>P-R-I</b>. Careful: <b>Integrity</b> is Operation, <b>Interoperability</b> is Transition.</div>
+
+<h3>ISO/IEC 25010:2023 Product Quality Model – 9 characteristics</h3>
+<p>Part of the <mark>SQuaRE</mark> series (<b>Systems and software Quality Requirements and Evaluation</b>). Published <b>15 November 2023 (2nd edition)</b>. The <b>2011 edition had 8</b> characteristics; <b>2023 has 9</b>: two renamed, one new.</p>
+<ol>
+<li><b>Functional Suitability</b> – completeness, correctness, appropriateness of functions</li>
+<li><b>Performance Efficiency</b> – time behavior, resource use, capacity</li>
+<li><b>Compatibility</b> – shares data and coexists with other software</li>
+<li><mark>Interaction Capability</mark> – <b>replaces “Usability”</b> (includes users with disabilities)</li>
+<li><b>Reliability</b> – availability, fault tolerance, recovery</li>
+<li><b>Security</b> – confidentiality, integrity, accountability</li>
+<li><b>Maintainability</b> – understand, fix, improve without breaking</li>
+<li><mark>Flexibility</mark> – <b>replaces “Portability”</b> (adapt, scale, move platforms)</li>
+<li><mark>Safety</mark> – <b>NEW in 2023</b>; avoids harm to people, property, environment</li>
+</ol>
+
+<h3>CMMI: Capability Maturity Model Integration</h3>
+<p>A <b>process-improvement framework</b>, currently maintained by <mark>ISACA</mark> (which acquired the CMMI Institute).</p>
+<ul>
+<li><b>Staged representation</b> – five predefined maturity levels, each building on the one before (focus of the lesson).</li>
+<li><b>Continuous representation</b> – rates individual process areas on their own capability scale; improve selectively.</li>
+</ul>
+<div class="tbl"><table>
+<tr><th>Level</th><th>Name</th><th>Description</th></tr>
+<tr><td>1</td><td><mark>Initial</mark></td><td>Ad hoc, even chaotic; success depends on individual effort.</td></tr>
+<tr><td>2</td><td><mark>Managed</mark></td><td>Basic project management: planned, performed, measured, controlled; each project may do it its own way.</td></tr>
+<tr><td>3</td><td><mark>Defined</mark></td><td>Processes documented as <b>organization-wide standards</b>, tailored per project.</td></tr>
+<tr><td>4</td><td><mark>Quantitatively Managed</mark></td><td>Uses <b>data and statistics</b> to control process performance.</td></tr>
+<tr><td>5</td><td><mark>Optimizing</mark></td><td><b>Continuous improvement</b> becomes a habit; pursues innovation.</td></tr>
+</table></div>
+<p class="mono">Memory trick: I Must Do Quality Often → Initial, Managed, Defined, Quantitatively Managed, Optimizing</p>
+
+<h3>ISO 9001 and software organizations</h3>
+<ul>
+<li>International standard for <mark>Quality Management Systems (QMS)</mark>. Generic and industry-neutral; it does <b>not</b> prescribe software practices directly.</li>
+<li>Software firms pair it with <mark>ISO/IEC 90003</mark>, the guideline that applies ISO 9001 to the software life cycle.</li>
+<li>Requires planned, controlled “product realization”; regular <b>internal audits</b>; <b>corrective and preventive action</b>; competent staff and tools; continual improvement via <mark>PDCA (Plan–Do–Check–Act)</mark>.</li>
+<li>Benefits: fewer defects, stronger customer confidence, competitive differentiator when bidding for contracts.</li>
+</ul>
+<div class="tbl"><table>
+<tr><th>Framework</th><th>Primary focus</th><th>Evaluates</th><th>Typical use</th></tr>
+<tr><td>McCall's</td><td>Product quality factors</td><td>Finished product (11 factors)</td><td>Structuring quality requirements &amp; test criteria</td></tr>
+<tr><td>ISO/IEC 25010:2023</td><td>Product quality characteristics</td><td>System/software product (9)</td><td>Specifying and evaluating product quality</td></tr>
+<tr><td>CMMI</td><td>Process maturity</td><td>Development processes (5 levels)</td><td>Benchmarking &amp; improving process capability</td></tr>
+<tr><td>ISO 9001</td><td>Quality management system</td><td>Organization-wide QMS</td><td>Certifying an organization's quality system</td></tr>
+</table></div>
+</article>
+
+<article class="lesson" id="L3">
+<div class="ln">Lesson 3</div>
+<h2>The SDLC and the Role of QA</h2>
+<p>The <mark>Software Development Life Cycle (SDLC)</mark> is the structured sequence of stages a project moves through, from idea to retirement. Projects may loop back (e.g., Maintenance can surface new requirements).</p>
+
+<h3>The 7 standard phases</h3>
+<ol>
+<li><b>Planning</b> – purpose, scope, feasibility; project plan, cost/benefit and risk assessment.</li>
+<li><b>Requirements Analysis</b> – gather user needs (interviews, surveys, workshops) → <mark>Software Requirements Specification (SRS)</mark>.</li>
+<li><b>Design</b> – architecture, data models, UI layouts → <mark>Software Design Document (SDD)</mark>.</li>
+<li><b>Implementation</b> – write code using coding standards, with peer code review.</li>
+<li><b>Testing</b> – unit, integration, system, acceptance testing; defects sent back to developers.</li>
+<li><b>Deployment</b> – release to production (strategies: <b>big-bang, blue-green, canary</b>), plus user training.</li>
+<li><b>Maintenance</b> – patches, bug fixes, enhancements.</li>
+</ol>
+
+<h3>SDLC models</h3>
+<div class="tbl"><table>
+<tr><th></th><th>Waterfall</th><th>V-Model</th><th>Agile</th></tr>
+<tr><td>Structure</td><td>Linear, sequential; each phase finishes before next</td><td>Linear, each dev phase <b>paired with a test phase</b></td><td>Iterative <b>sprints</b> (often 1–4 weeks)</td></tr>
+<tr><td>When testing occurs</td><td>Only after development ends (defects surface late)</td><td>Planned alongside each dev phase</td><td>Continuously, within every sprint</td></tr>
+<tr><td>Flexibility</td><td>Low – changes costly</td><td>Low to moderate</td><td>High</td></tr>
+<tr><td>Best for</td><td>Small, well-defined projects, stable requirements</td><td><b>Safety-critical / regulated</b> projects</td><td>Evolving products, frequent releases</td></tr>
+</table></div>
+<p><b>V-Model pairs</b> (left side = Verification, right side = Validation, Coding at the bottom):</p>
+<ul>
+<li>Requirements ↔ <b>Acceptance Testing</b></li>
+<li>System Design ↔ <b>System Testing</b></li>
+<li>Architecture Design ↔ <b>Integration Testing</b></li>
+<li>Module Design ↔ <b>Unit Testing</b></li>
+</ul>
+<p><b>Agile sprint cycle:</b> Plan → Design → Develop → Test → Review.</p>
+
+<h3>Shift-Left testing</h3>
+<p><mark>Shift-left</mark> means moving QA activities <b>earlier</b> in the SDLC instead of concentrating testing at the end. Benefits: <b>cost efficiency</b>, <b>better quality</b> (less technical debt), <b>speed without sacrifice</b>.</p>
+<ul>
+<li>Planning – QA defines measurable quality goals and testable objectives</li>
+<li>Requirements – reviewed for clarity, completeness, testability</li>
+<li>Design – design/architecture reviews; test strategy planned</li>
+<li>Implementation – unit tests, static code analysis, often <mark>TDD</mark> (test-driven development)</li>
+<li>Testing – integration, system, regression, UAT</li>
+<li>Deployment – release verification and <b>smoke tests</b>; monitoring</li>
+<li>Maintenance – every patch gets <b>regression-tested</b></li>
+</ul>
+
+<h3>QA roles</h3>
+<div class="tbl"><table>
+<tr><th>Role</th><th>Responsibility</th></tr>
+<tr><td><mark>QA Manager / Lead</mark></td><td>Owns overall quality strategy, decides how much testing is enough, sets standards, manages QA staff, reports to stakeholders.</td></tr>
+<tr><td><mark>QA Analyst</mark></td><td>Reviews requirements for testability, designs test plans and detailed test cases, defines acceptance criteria.</td></tr>
+<tr><td><mark>Manual Test Engineer</mark></td><td>Executes test cases by hand (functional, exploratory, usability); documents defects.</td></tr>
+<tr><td><mark>Automation Test Engineer</mark></td><td>Builds automated scripts and CI/CD test pipelines (Selenium, Cypress).</td></tr>
+<tr><td><mark>Performance Test Engineer</mark></td><td>Checks speed, stability, scalability under load (response time, throughput).</td></tr>
+<tr><td><mark>UAT Coordinator</mark></td><td>Works with real end users during User Acceptance Testing.</td></tr>
+</table></div>
+</article>
+
+<article class="lesson" id="L4">
+<div class="ln">Lesson 4</div>
+<h2>Fundamentals of Software Testing</h2>
+<p><mark>Software testing</mark> is a set of activities (planning, analysis, design, implementation, execution, evaluation) used to determine whether a work product satisfies specified requirements, to demonstrate it is fit for purpose, and to detect defects. <b>Testing is a process, not a single act.</b></p>
+<p><b>Test process (5):</b> Test planning &amp; control → Test analysis &amp; design → Test implementation → Test execution → Test completion/reporting. Execution is only one of the five.</p>
+
+<h3>Error → Defect → Failure</h3>
+<ul>
+<li><mark>Error (mistake)</mark> – a human action that produces an incorrect result (developer misremembers the overtime rule).</li>
+<li><mark>Defect (fault / bug)</mark> – the flaw left in a work product (calculateOvertime() multiplies every hour by 1.5×).</li>
+<li><mark>Failure</mark> – the defect is triggered and produces a visible wrong result (wrong paycheck).</li>
+</ul>
+<p>Not every defect causes a failure; it shows only when the flawed step is executed.</p>
+
+<h3>8 objectives of testing</h3>
+<ol>
+<li>Evaluate work products</li><li>Trigger failures &amp; find defects</li><li>Ensure required coverage</li><li>Reduce risk of poor quality</li>
+<li>Verify requirements are met</li><li>Verify compliance (laws, standards, contracts)</li><li>Inform stakeholder decisions</li><li>Build confidence</li>
+</ol>
+
+<h3>Testing vs Debugging</h3>
+<div class="tbl"><table>
+<tr><th>Testing</th><th>Debugging</th></tr>
+<tr><td>Finds and reports that a defect exists; does <b>not</b> fix</td><td>Finds the root cause of a known defect and changes the code to fix it</td></tr>
+<tr><td>Done by testers, developers, business analysts</td><td>Development activity, done by the developer</td></tr>
+<tr><td>Planned part of the formal test process</td><td>Follows testing; triggered by a reported failure</td></tr>
+</table></div>
+<p>Analogy: testing = doctor's diagnosis; debugging = surgeon's repair.</p>
+
+<h3>The 7 testing principles</h3>
+<ol>
+<li><mark>Testing shows the presence of defects</mark> – cannot prove software is defect-free (clean blood test analogy).</li>
+<li><mark>Exhaustive testing is impossible</mark> – use risk analysis and techniques (10 fields × 5 values = 9.7 million combos).</li>
+<li><mark>Early testing saves time and money</mark> – fix in requirements, not production (essay typo analogy).</li>
+<li><mark>Defects cluster together</mark> – few modules hold most defects; <b>Pareto 80/20</b> (dangerous intersections analogy).</li>
+<li><mark>Beware the pesticide paradox</mark> – same tests repeated stop finding new defects; review and update tests.</li>
+<li><mark>Testing is context dependent</mark> – hospital system vs puzzle game (paper airplane vs jet).</li>
+<li><mark>Absence-of-errors is a fallacy</mark> – bug-free but wrong/unusable product still fails (too-short ladder).</li>
+</ol>
+
+<h3>Static testing (without executing code)</h3>
+<p>Examines work products (requirements, designs, code) without running them. Two families: <b>reviews</b> (people) and <mark>static analysis</mark> (tools: unreachable code, syntax violations, security vulnerabilities). Analogy: proofreading.</p>
+<p><b>Four levels of review formality</b> (least → most formal):</p>
+<ol>
+<li><mark>Informal review</mark> – no defined process, often no written record.</li>
+<li><mark>Walkthrough</mark> – <b>the author leads</b> peers through the work product.</li>
+<li><mark>Technical review</mark> – trained peers/experts, checklist, technical content only, <b>no managers</b>.</li>
+<li><mark>Inspection</mark> – <b>most formal</b>: defined roles (author, <b>moderator</b>, reviewers), checklists, metrics, formal entry/exit criteria.</li>
+</ol>
+
+<h3>Dynamic testing (executing code)</h3>
+<p>Running the software with test cases and comparing actual vs expected results. Analogy: test-driving a car. Levels: unit, integration, system, acceptance.</p>
+<div class="tbl"><table>
+<tr><th>Aspect</th><th>Static</th><th>Dynamic</th></tr>
+<tr><td>Code execution</td><td>Not required</td><td>Required</td></tr>
+<tr><td>When</td><td>Very early</td><td>After code can run</td></tr>
+<tr><td>Finds</td><td>Defects directly</td><td>Failures (defects inferred)</td></tr>
+<tr><td>Cost to fix</td><td>Lower</td><td>Higher</td></tr>
+</table></div>
+
+<h3>Independence in testing</h3>
+<p>Authors carry assumptions and blind spots; independent testers bring fresh eyes. Benefits: different defects found, assumptions verified, objective assessment. Drawbacks: isolation, developers lose ownership (“that's the tester's job”), testers may lack domain knowledge.</p>
+<ol>
+<li><b>No independence</b> – developers test their own code</li>
+<li><b>Within the team</b> – testers embedded in the dev team</li>
+<li><b>Independent test team</b> – separate QA department, same company</li>
+<li><b>Business / user community</b> – real users (e.g., UAT)</li>
+<li><b>External / outsourced</b> – outside firm (e.g., penetration testing)</li>
+</ol>
+<p>Most organizations operate at Levels 2–3 and reserve 4–5 for critical releases.</p>
+</article>
+
+<article class="lesson" id="L5">
+<div class="ln">Lesson 5</div>
+<h2>Levels of Testing &amp; Acceptance Testing</h2>
+<div class="tbl"><table>
+<tr><th></th><th>Unit</th><th>Integration</th><th>System</th><th>Acceptance</th></tr>
+<tr><td>Focus</td><td>One unit in isolation</td><td>Interfaces between units/systems</td><td>Whole system, end to end</td><td>Readiness for real use</td></tr>
+<tr><td>Question</td><td>Does this piece work?</td><td>Do the pieces work together?</td><td>Does it meet the requirements?</td><td>Is this what users need?</td></tr>
+<tr><td>Test basis</td><td>Detailed design, code</td><td>Architecture, interface specs</td><td>Requirements specification</td><td>Business needs, contracts</td></tr>
+<tr><td>Done by</td><td>Developers</td><td>Developers / testers</td><td>Independent testers</td><td>Users, customer</td></tr>
+<tr><td>Typical defects</td><td>Wrong formula, unhandled input</td><td>Data format mismatch, wrong calls, timeouts</td><td>End-to-end failures, slow speed, security gaps</td><td>Workflow doesn't fit business</td></tr>
+</table></div>
+<ul>
+<li><mark>Unit testing</mark> (component testing): smallest testable part in isolation; frameworks JUnit, pytest, Jest. Analogy: checking each brick.</li>
+<li><mark>Integration testing</mark>: ISTQB names <b>component integration testing</b> (modules of one system) and <b>system integration testing</b> (with external systems). Analogy: group project in inches vs cm.</li>
+<li><mark>System testing</mark>: complete system vs requirements, <b>functional and non-functional</b>, production-like environment. Analogy: full dress rehearsal.</li>
+<li><mark>Acceptance testing</mark>: “Did we build the right thing?” Result is a decision: accept or not yet. Analogy: final house walkthrough.</li>
+</ul>
+
+<h3>Test doubles: Stub, Mock, Driver</h3>
+<div class="tbl"><table>
+<tr><th>Double</th><th>Purpose</th><th>Think of it as</th></tr>
+<tr><td><mark>Stub</mark></td><td>Fake <b>lower</b> component that returns predefined data</td><td>Provider: “Here is the data you need.”</td></tr>
+<tr><td><mark>Mock</mark></td><td>Fake component that <b>checks behavior</b> (was the method called correctly?)</td><td>Checker: “Did you do the right thing?”</td></tr>
+<tr><td><mark>Driver</mark></td><td>Fake <b>upper</b> caller that provides input to the system under test</td><td>Controller: “Here is the input. Do your job.”</td></tr>
+</table></div>
+
+<h3>Integration approaches</h3>
+<div class="tbl"><table>
+<tr><th></th><th>Big Bang</th><th>Top-Down</th><th>Bottom-Up</th><th>Sandwich (Hybrid)</th></tr>
+<tr><td>Start</td><td>Everything at once</td><td>Top module</td><td>Lowest modules</td><td>Top and bottom together, meet at middle (target) layer</td></tr>
+<tr><td>Helpers</td><td>None</td><td><mark>Stubs</mark></td><td><mark>Drivers</mark></td><td>Stubs and drivers</td></tr>
+<tr><td>Finding faulty interface</td><td>Hard</td><td>Easier</td><td>Easier</td><td>Easier</td></tr>
+<tr><td>Early UI / skeleton</td><td>No</td><td>Yes</td><td>No</td><td>Partly</td></tr>
+<tr><td>Core logic early</td><td>No</td><td>No</td><td>Yes</td><td>Yes</td></tr>
+<tr><td>Best for</td><td>Very small systems</td><td>UI-driven systems, early demos</td><td>Critical low-level logic</td><td>Large systems, several teams</td></tr>
+</table></div>
+<p>Top-Down cons: many stubs, low-level modules tested late, stubs may hide real behavior. Bottom-Up cons: needs drivers, no UI until late, top-level design flaws found late. Sandwich cons: more cost, more coordination, middle layer may get less testing.</p>
+
+<h3>System testing</h3>
+<p><b>Purpose:</b> verify requirements, check quality attributes (ISO/IEC 25010), find end-to-end defects, reduce risk and build confidence.</p>
+<p><b>Functional</b> = WHAT the system does. <b>Non-functional</b> = HOW WELL: performance, security, usability, reliability, compatibility.</p>
+<p><b>7 steps:</b> Plan → Design → Prepare → Execute → Report → Retest &amp; Regress → Close. Repeat until exit criteria are met.</p>
+<ul><li><b>Entry criterion</b> example: integration testing completed, build installed.</li><li><b>Exit criterion</b> example: all high-priority tests executed, no open critical defects.</li></ul>
+
+<h3>Acceptance testing forms (ISTQB, 5)</h3>
+<ol>
+<li><mark>User Acceptance Testing (UAT)</mark> – intended users confirm it fits business processes; ends in <b>formal sign-off</b>; typical for custom systems.</li>
+<li><mark>Operational acceptance testing</mark> – IT operations staff check backup, recovery, installation, maintenance, security procedures.</li>
+<li><mark>Contractual &amp; regulatory</mark> – against contract criteria or laws (e.g., Data Privacy Act).</li>
+<li><mark>Alpha testing</mark> – at the <b>developer's site</b> by potential users/independent team (not the developers), near end of development. Analogy: taste-testing in the kitchen.</li>
+<li><mark>Beta testing</mark> – real users in <b>their own environment</b>, after alpha, before final release. Analogy: soft opening.</li>
+</ol>
+</article>
+
+<article class="lesson" id="L6">
+<div class="ln">Lesson 6</div>
+<h2>Black-Box Test Design Techniques</h2>
+<p><mark>Black-box testing</mark> designs tests from the specification only, without looking at internal code. Also called <mark>specification-based testing</mark> (ISTQB) or behavioral testing. Usable at <b>all test levels</b>. Based on requirements, user stories, use cases, business rules. Analogy: a vending machine.</p>
+
+<h3>1. Equivalence Partitioning (EP)</h3>
+<p>Divide inputs into <b>partitions</b> where all values are processed the same way; test <b>one representative value per partition</b>. There are <b>valid</b> and <b>invalid</b> partitions. Analogy: sorting laundry.</p>
+<p><b>4 steps:</b> Identify the input → Find the partitions → Pick one value each → Write test cases. Test each <b>invalid</b> partition in its <b>own</b> test case so one error does not hide another.</p>
+<p>Example, age 18–60: below 18 (10, invalid), 18–60 (35, valid), above 60 (75, invalid) → <b>3 tests</b>.</p>
+
+<h3>2. Boundary Value Analysis (BVA)</h3>
+<p>Tests the <b>edges</b> (min and max) of partitions, where bugs like <span class="mono">&lt;</span> instead of <span class="mono">&lt;=</span> hide. Only for <b>ordered</b> partitions (numbers, dates, lengths). Used together with EP. Analogy: speed limit sign.</p>
+<div class="tbl"><table>
+<tr><th>Version</th><th>Values tested</th><th>Age 18–60</th></tr>
+<tr><td><mark>2-value BVA</mark></td><td>Boundary + closest outside neighbor</td><td>17, 18, 60, 61 (4 values)</td></tr>
+<tr><td><mark>3-value BVA</mark></td><td>Boundary + both neighbors</td><td>17, 18, 19, 59, 60, 61 (6 values)</td></tr>
+</table></div>
+<p>Example, quantity 1–10: EP value 5; BVA 0 (reject), 1, 10 (accept), 11 (reject).</p>
+
+<h3>3. Decision Table Testing</h3>
+<p>For behavior depending on <b>combinations of conditions</b> (business rules). Lists <b>conditions</b> and <b>actions</b>; each <b>column is a rule</b> = one test case. Number of rules = <mark>2ⁿ</mark> for n yes/no conditions; reduce with “<mark>don't care</mark>” (–).</p>
+<div class="tbl"><table>
+<tr><th>Loan pre-approval</th><th>R1</th><th>R2</th><th>R3</th><th>R4</th></tr>
+<tr><td>Good credit score?</td><td>Y</td><td>Y</td><td>N</td><td>N</td></tr>
+<tr><td>Sufficient income?</td><td>Y</td><td>N</td><td>Y</td><td>N</td></tr>
+<tr><td>Pre-approve</td><td>✔</td><td></td><td></td><td></td></tr>
+<tr><td>Reject</td><td></td><td>✔</td><td>✔</td><td>✔</td></tr>
+</table></div>
+
+<h3>4. State Transition Testing</h3>
+<p>For systems whose behavior depends on the <b>current state</b> and past events (the same input gives different results). Modeled as a state transition <b>diagram</b> or <b>table</b>. Tests both valid and <b>invalid</b> transitions. Analogy: traffic light. Example: ATM PIN entry (3 wrong PINs → card retained).</p>
+<ul>
+<li><mark>State</mark> – condition the system is in (Waiting for PIN)</li>
+<li><mark>Event</mark> – something that happens (Enter PIN)</li>
+<li><mark>Transition</mark> – change from one state to another</li>
+<li><mark>Action</mark> – what the system does during a transition (show “Try again”)</li>
+<li><mark>Guard</mark> – optional condition that must be true ([PIN is correct])</li>
+</ul>
+<p>ISTQB notation: <span class="mono">event [guard] / action</span>. Coverage: all states, all valid transitions (<b>0-switch</b>), all transitions including invalid.</p>
+<div class="tbl"><table>
+<tr><th></th><th>EP</th><th>BVA</th><th>Decision Table</th><th>State Transition</th></tr>
+<tr><td>Use when</td><td>Input has ranges/categories</td><td>Inputs are ordered</td><td>Many if/and/or rules</td><td>Behavior depends on history</td></tr>
+<tr><td>Test cases from</td><td>One value per partition</td><td>Boundaries and neighbors</td><td>One per rule (column)</td><td>Paths through the diagram</td></tr>
+<tr><td>Example</td><td>Promo code length</td><td>Quantity 1–10</td><td>Member + order total</td><td>ATM PIN attempts</td></tr>
+</table></div>
+</article>
+
+<article class="lesson" id="L7">
+<div class="ln">Lesson 7</div>
+<h2>Test Case Documentation</h2>
+<h3>Test Plan</h3>
+<p>A <mark>test plan</mark> describes the <b>scope, approach, resources, and schedule</b> of testing: what, how, by whom, when, and the risks. Analogy: planning a field trip.</p>
+<p><b>Standards timeline:</b> <mark>IEEE 829</mark> first published <b>1983</b> → IEEE 829-<b>1998</b> (classic <b>16-section</b> test plan) → 829-2008 revision → <b>2013</b> <mark>ISO/IEC/IEEE 29119-3</mark> replaces IEEE 829 → <b>2021</b> current edition.</p>
+<div class="tbl"><table>
+<tr><th>#</th><th>Component</th><th>#</th><th>Component</th></tr>
+<tr><td>1</td><td>Test Plan Identifier</td><td>9</td><td>Test Deliverables</td></tr>
+<tr><td>2</td><td>Introduction</td><td>10</td><td>Testing Tasks</td></tr>
+<tr><td>3</td><td>Test Items</td><td>11</td><td>Environmental Needs</td></tr>
+<tr><td>4</td><td>Features to Be Tested</td><td>12</td><td>Responsibilities</td></tr>
+<tr><td>5</td><td>Features Not to Be Tested</td><td>13</td><td>Staffing &amp; Training Needs</td></tr>
+<tr><td>6</td><td>Approach</td><td>14</td><td>Schedule</td></tr>
+<tr><td>7</td><td>Item Pass/Fail Criteria</td><td>15</td><td>Risks &amp; Contingencies</td></tr>
+<tr><td>8</td><td>Suspension &amp; Resumption Criteria</td><td>16</td><td>Approvals</td></tr>
+</table></div>
+
+<h3>Test Case</h3>
+<p>A <mark>test case</mark> is a set of preconditions, inputs (test data), actions (steps), expected results, and postconditions, developed to check <b>one</b> specific condition or requirement. Analogy: a recipe card (the photo of the dish = expected result, decided before cooking).</p>
+<p><b>12 components:</b> Test Case ID, Title/Description, Requirement ID, Module/Feature, Priority, Preconditions, Test Data, Test Steps, Expected Result, <i>Actual Result</i>, <i>Status</i>, Prepared/Executed by &amp; Date. (Actual Result and Status are filled in during execution.)</p>
+<p><b>Status values:</b> Pass / Fail / Blocked / Not Run.</p>
+<p><b>Good test case qualities:</b> clear &amp; specific, one purpose, traceable, repeatable, independent, measurable result. A poor test case has no ID or requirement link, vague steps, no test data, and an untestable expected result (“System works properly”).</p>
+
+<h3>Requirements Traceability Matrix (RTM)</h3>
+<p>A table linking each <b>requirement</b> to the <b>test cases</b> that verify it, usually with execution status and defects. A requirement with no test case is a <b>gap</b>. Supports impact analysis and shows progress. Analogy: packing checklist.</p>
+<ul>
+<li><mark>Forward traceability</mark> – Requirement → Test cases. “Is every requirement tested?”</li>
+<li><mark>Backward traceability</mark> – Test case → Requirement. “Why does this test exist?”</li>
+<li><mark>Bidirectional</mark> – both directions; most complete and most commonly used.</li>
+</ul>
+
+<h3>White-box coverage (from the key takeaways)</h3>
+<p>White-box testing designs tests from the code's structure. Coverage strength: <b>Statement &lt; Branch/Decision &lt; Path</b>. 100% branch coverage guarantees 100% statement coverage, but not the reverse. Full path coverage is often impractical.</p>
+</article>
+
+</div></div>
+</section>
+
+<!-- ===================== MEMORIZE ===================== -->
+<section id="v-memo" hidden>
+<div class="sec-h">Numbers and names that get asked</div>
+<div class="facts">
+  <div class="fact"><div class="v">1977</div><div class="d">McCall's model (McCall, Richards, Walters) for U.S. Air Force + GE</div></div>
+  <div class="fact"><div class="v">11 · 5/3/3</div><div class="d">McCall factors: Operation 5, Revision 3, Transition 3</div></div>
+  <div class="fact"><div class="v">8 → 9</div><div class="d">ISO/IEC 25010 characteristics, 2011 → 2023</div></div>
+  <div class="fact"><div class="v">15 Nov 2023</div><div class="d">ISO/IEC 25010:2023 published (2nd edition)</div></div>
+  <div class="fact"><div class="v">5 levels</div><div class="d">CMMI maturity levels (maintained by ISACA)</div></div>
+  <div class="fact"><div class="v">7 phases</div><div class="d">Standard SDLC, Planning to Maintenance</div></div>
+  <div class="fact"><div class="v">80/20</div><div class="d">Pareto principle (Juran; defect clustering)</div></div>
+  <div class="fact"><div class="v">16 sections</div><div class="d">IEEE 829-1998 test plan</div></div>
+  <div class="fact"><div class="v">1983</div><div class="d">IEEE 829 first published</div></div>
+  <div class="fact"><div class="v">29119-3</div><div class="d">ISO/IEC/IEEE standard that replaced IEEE 829 (2013; current 2021)</div></div>
+  <div class="fact"><div class="v">2ⁿ</div><div class="d">Rules in a decision table with n yes/no conditions</div></div>
+  <div class="fact"><div class="v">4 vs 6</div><div class="d">Values in 2-value vs 3-value BVA for one range</div></div>
+</div>
+<div class="sec-h">Lists for enumeration</div>
+<div class="memo-grid" id="memoGrid"></div>
+</section>
+
+<!-- ===================== PRACTICE ===================== -->
+<section id="v-practice" hidden>
+<div class="ptabs" role="tablist" id="ptabs"></div>
+<div class="board">
+  <div class="score" id="scoreTxt">0 / 0<small>answered 0</small></div>
+  <div class="bar" aria-hidden="true"><i id="scoreBar"></i></div>
+  <button class="btn" id="shuffleBtn">Shuffle</button>
+  <button class="btn" id="resetBtn">Reset</button>
+</div>
+<div id="qwrap"><div class="qlist" id="q-mc"></div><div class="qlist" id="q-tf" hidden></div><div class="qlist" id="q-id" hidden></div><div class="qlist" id="q-en" hidden></div></div>
+</section>
+
+</main>
+
+<script>
+// ---------------- DATA ----------------
+const MC = [
+ ["Who defined quality as “conformance to requirements”?",["Joseph Juran","Philip Crosby","Jim McCall","ISO"],1,"Crosby = conformance to requirements; Juran = fitness for use."],
+ ["Juran defined quality as:",["Zero defects","Conformance to requirements","Fitness for use","Inherent characteristics"],2,"Juran emphasized the product must work well for the people using it."],
+ ["The Juran Trilogy consists of:",["Planning, control, improvement","Prevention, appraisal, failure","Plan, do, check","Verification, validation, testing"],0,"Quality planning, quality control, quality improvement."],
+ ["Which statement best describes Quality Assurance?",["Product-oriented, detects defects","Process-oriented, prevents defects","Executes the software to find failures","Fixes defects in the code"],1,"QA focuses on the process so that defects are prevented."],
+ ["A reviewer inspects a finished module against a checklist to detect deviations. This is:",["Quality Assurance","Quality Control","Debugging","Prevention"],1,"Examining the actual product for defects is QC."],
+ ["“Are we building the right product?” describes:",["Verification","Validation","Quality Assurance","Inspection"],1,"Validation = right product; Verification = product right."],
+ ["Which Cost of Quality category is almost always the most expensive?",["Prevention","Appraisal","Internal failure","External failure"],3,"Defects found after delivery bring warranty claims, support, reputation damage and legal liability."],
+ ["Sending all developers to a secure-coding workshop before a project starts is a(n):",["Prevention cost","Appraisal cost","Internal failure cost","External failure cost"],0,"Training prevents defects before they happen."],
+ ["McCall's Quality Model was developed for the:",["ISO","U.S. Air Force","ISACA","IEEE"],1,"1977, McCall, Richards and Walters, U.S. Air Force with General Electric."],
+ ["Which McCall factor belongs to Product Revision?",["Portability","Integrity","Testability","Reusability"],2,"Revision = Maintainability, Flexibility, Testability."],
+ ["Which McCall factor belongs to Product Transition?",["Interoperability","Reliability","Correctness","Maintainability"],0,"Transition = Portability, Reusability, Interoperability."],
+ ["Which characteristic is brand new in ISO/IEC 25010:2023?",["Security","Flexibility","Safety","Compatibility"],2,"Safety was added; Flexibility and Interaction Capability were renames."],
+ ["In ISO/IEC 25010:2023, “Interaction Capability” replaces:",["Portability","Usability","Reliability","Functional Suitability"],1,"Interaction Capability replaces Usability; Flexibility replaces Portability."],
+ ["ISO/IEC 25010 is part of which series?",["SQuaRE","CMMI","PDCA","SWEBOK"],0,"SQuaRE = Systems and software Quality Requirements and Evaluation."],
+ ["CMMI level where processes are documented as organization-wide standards:",["Managed","Defined","Quantitatively Managed","Optimizing"],1,"Level 3 Defined."],
+ ["CMMI level that uses data and statistics to control process performance:",["Level 2","Level 3","Level 4","Level 5"],2,"Level 4 Quantitatively Managed."],
+ ["The guideline that applies ISO 9001 to the software life cycle:",["ISO/IEC 25010","ISO/IEC 90003","IEEE 829","ISO/IEC/IEEE 29119-3"],1,"ISO 9001 is generic, so software firms pair it with ISO/IEC 90003."],
+ ["ISO 9001's continual-improvement cycle is:",["SDLC","PDCA","TDD","RTM"],1,"Plan–Do–Check–Act."],
+ ["Which SDLC phase produces the Software Requirements Specification (SRS)?",["Planning","Requirements Analysis","Design","Implementation"],1,"Design produces the SDD instead."],
+ ["The SDLC model that pairs every development phase with a testing phase:",["Waterfall","Agile","V-Model","Big Bang"],2,"Left side verification, right side validation."],
+ ["In the V-Model, Architecture Design is paired with:",["Unit testing","Integration testing","System testing","Acceptance testing"],1,"Requirements↔Acceptance, System Design↔System, Architecture↔Integration, Module Design↔Unit."],
+ ["Which SDLC model is best suited for safety-critical or regulated projects?",["Waterfall","V-Model","Agile","Big Bang"],1,"Per the comparison table in Lesson 3."],
+ ["Which QA role builds automated test scripts using Selenium or Cypress?",["Manual Test Engineer","QA Analyst","Automation Test Engineer","UAT Coordinator"],2,"Also maintains CI/CD test pipelines."],
+ ["A developer misremembers the overtime rule. This human mistake is a(n):",["Error","Defect","Failure","Bug report"],0,"Error → Defect (flaw in code) → Failure (wrong paycheck)."],
+ ["A regression suite that never changes stops finding new bugs. Which principle?",["Defects cluster together","Pesticide paradox","Exhaustive testing is impossible","Context dependent"],1,"Tests must be reviewed and updated regularly."],
+ ["“About 80% of defects come from 20% of modules” illustrates:",["Early testing","Defects cluster together","Absence-of-errors fallacy","Pesticide paradox"],1,"An application of the Pareto principle."],
+ ["A perfectly bug-free app that solves the wrong problem still fails. Which principle?",["Testing shows presence of defects","Absence-of-errors is a fallacy","Context dependent","Early testing"],1,"The too-short ladder analogy."],
+ ["The most formal type of review:",["Informal review","Walkthrough","Technical review","Inspection"],3,"Defined roles including a moderator, checklists, metrics, entry/exit criteria."],
+ ["In which review does the author lead peers through the work product?",["Inspection","Walkthrough","Technical review","Informal review"],1,"The author explains their thinking step by step."],
+ ["Which is a static testing technique?",["Unit testing","System testing","Code review","Acceptance testing"],2,"Static testing examines work products without executing them."],
+ ["Top-down integration replaces missing lower modules with:",["Drivers","Stubs","Mocks","Users"],1,"Bottom-up uses drivers; sandwich uses both."],
+ ["Which test double is described as “Here is the input. Do your job.”?",["Stub","Mock","Driver","Spy"],2,"Stub = gives data, Mock = checks behavior, Driver = gives input."],
+ ["Which integration approach makes it hardest to find which interface caused a failure?",["Top-down","Bottom-up","Sandwich","Big Bang"],3,"Everything is joined at once."],
+ ["Testing done at the developer's site by potential users, before release to outsiders:",["Beta testing","Alpha testing","Operational testing","Regression testing"],1,"Beta happens in the users' own environment."],
+ ["Acceptance testing by IT operations staff checking backup and recovery:",["UAT","Operational acceptance testing","Contractual acceptance testing","Beta testing"],1,"One of the five ISTQB forms of acceptance testing."],
+ ["Black-box testing is also called (ISTQB):",["Structure-based testing","Specification-based testing","Code-based testing","Static analysis"],1,"Also called behavioral testing."],
+ ["Using 3-value BVA on an age field of 18–60, which values are tested?",["17, 18, 60, 61","18, 35, 60","17, 18, 19, 59, 60, 61","0, 18, 60, 100"],2,"Boundary plus both neighbors at each edge."],
+ ["A decision table with 3 yes/no conditions has how many rules?",["3","6","8","9"],2,"2³ = 8."],
+ ["ATM PIN entry (3 wrong PINs retains the card) is best tested with:",["Equivalence partitioning","Boundary value analysis","Decision table","State transition testing"],3,"Behavior depends on history: the same wrong PIN gives different results."],
+ ["Test plan component that says when to pause testing and what is needed to restart:",["Item pass/fail criteria","Suspension & resumption criteria","Risks & contingencies","Approach"],1,"E.g., pause if login fails; resume after a fixed build."],
+ ["The standard that replaced IEEE 829:",["ISO 9001","ISO/IEC 25010","ISO/IEC/IEEE 29119-3","ISO/IEC 90003"],2,"Replaced in 2013; current edition 2021."],
+ ["Which traceability answers “Why does this test exist?”",["Forward","Backward","Bidirectional","Horizontal"],1,"Test case → requirement."],
+ ["A test case that cannot run because the payment sandbox is down should be marked:",["Pass","Fail","Blocked","Not Run"],2,"Blocked = prevented from executing by something outside the test."]
+];
+
+const TF = [
+ ["Testing can prove that software is completely defect-free.",false,"Testing shows the presence of defects, not their absence."],
+ ["Quality Control is product-oriented.",true,"QC examines the actual software product."],
+ ["Software testing is a specific activity under Quality Control.",true,"Testing is a technical activity under QC."],
+ ["Verification is typically done by executing the code.",false,"Verification uses reviews, walkthroughs and inspections without executing code."],
+ ["Internal failure costs arise when defects are found after delivery to the customer.",false,"That is external failure. Internal = before delivery."],
+ ["Crosby emphasized prevention over inspection.",true,"He also promoted zero defects."],
+ ["McCall's Product Operation category has three factors.",false,"It has five: Correctness, Efficiency, Integrity, Reliability, Usability."],
+ ["The 2011 edition of ISO/IEC 25010 defined 8 characteristics.",true,"The 2023 revision has 9."],
+ ["CMMI is currently maintained by ISACA.",true,"ISACA acquired the CMMI Institute."],
+ ["ISO 9001 prescribes specific software development practices.",false,"It is generic and industry-neutral; ISO/IEC 90003 applies it to software."],
+ ["In the Waterfall model, testing begins only after the entire build is complete.",true,"That is why defects surface late."],
+ ["Shift-left means concentrating testing at the end, right before release.",false,"Shift-left moves QA earlier in the SDLC."],
+ ["Testing and debugging are the same activity.",false,"Testing finds and reports; debugging finds the root cause and fixes."],
+ ["Not every defect causes a failure.",true,"A defect only becomes visible when the flawed step is executed."],
+ ["Exhaustive testing is achievable for most real-world systems.",false,"Only in the simplest cases."],
+ ["A technical review usually includes managers.",false,"Technical reviews involve trained peers and experts, no managers."],
+ ["Static testing finds defects directly in the work product.",true,"Dynamic testing finds failures, from which defects are inferred."],
+ ["Unit testing is usually done by developers.",true,"Often automated with JUnit, pytest or Jest."],
+ ["Bottom-up integration requires drivers.",true,"Drivers act as fake upper callers."],
+ ["Big Bang integration needs many stubs and drivers.",false,"Big Bang needs no helpers; everything is combined at once."],
+ ["Beta testing happens before alpha testing.",false,"Alpha first (developer's site), then beta (users' environment)."],
+ ["UAT ends with a formal decision to accept the system or not.",true,"The customer signs off or reports issues."],
+ ["System testing covers both functional and non-functional requirements.",true,"Performance, security, usability, reliability and compatibility are non-functional."],
+ ["BVA can be applied to unordered categories such as colors.",false,"BVA needs ordered partitions: numbers, dates, lengths."],
+ ["In EP, several invalid partitions should be combined into one test case.",false,"Each invalid partition gets its own test so one error does not hide another."],
+ ["Each column of a decision table represents a rule.",true,"Each rule becomes at least one test case."],
+ ["In state transition testing, only valid transitions need to be tested.",false,"Invalid transitions must also be rejected and tested."],
+ ["A requirement with no test case in the RTM indicates a gap.",true,"The RTM shows untested requirements at a glance."],
+ ["100% statement coverage guarantees 100% branch coverage.",false,"It is the reverse: 100% branch guarantees 100% statement."],
+ ["Bidirectional traceability is the most commonly used form.",true,"It combines forward and backward checks."],
+ ["Higher levels of test independence are faster and cheaper to involve.",false,"They are more objective but slower and costlier."],
+ ["Expected results in a test case are filled in during execution.",false,"Expected results are written during design; actual result and status are filled in during execution."]
+];
+
+// [prompt, display answer, [accepted keys]]
+const ID = [
+ ["Quality expert who wrote “Quality Is Free” and promoted zero defects.","Philip Crosby",["crosby"]],
+ ["Quality expert who introduced the Trilogy and taught that quality must be planned.","Joseph Juran",["juran"]],
+ ["The 80/20 rule promoted by Juran in quality management.","Pareto principle",["pareto"]],
+ ["Process-oriented approach that ensures defects are prevented.","Quality Assurance (QA)",["quality assurance","qa"]],
+ ["Product-oriented approach that examines the software to identify defects.","Quality Control (QC)",["quality control","qc"]],
+ ["Checks whether software conforms to its specifications; “building the product right.”","Verification",["verification"]],
+ ["Checks whether software meets user needs; “building the right product.”","Validation",["validation"]],
+ ["Method of measuring the total cost of quality-related efforts and deficiencies.","Cost of Quality (COQ)",["cost of quality","coq"]],
+ ["COQ category for testing, inspections, and code reviews.","Appraisal costs",["appraisal"]],
+ ["Family of standards that ISO/IEC 25010 belongs to.","SQuaRE",["square"]],
+ ["CMMI Level 1, where processes are ad hoc and chaotic.","Initial",["initial"]],
+ ["CMMI level where continuous improvement becomes a habit.","Optimizing (Level 5)",["optimizing","optimising"]],
+ ["International standard for Quality Management Systems.","ISO 9001",["9001"]],
+ ["Document from Requirements Analysis that developers and testers build and test against.","Software Requirements Specification (SRS)",["srs","software requirements specification","requirements specification"]],
+ ["Technical blueprint document produced in the Design phase.","Software Design Document (SDD)",["sdd","software design document","design document"]],
+ ["Philosophy of moving QA activities earlier in the SDLC.","Shift-Left testing",["shift left","shiftleft"]],
+ ["Development practice where tests are written before the code.","Test-driven development (TDD)",["tdd","test driven"]],
+ ["QA role that works directly with real end users during acceptance testing.","UAT Coordinator",["uat coordinator"]],
+ ["Flaw left behind in a work product because of a human error.","Defect (fault / bug)",["defect","fault","bug"]],
+ ["Visible wrong result produced when a defect is triggered.","Failure",["failure"]],
+ ["Finding the exact root cause of a reported defect and changing the code to fix it.","Debugging",["debugging"]],
+ ["Principle: running the same tests repeatedly eventually stops finding new defects.","Pesticide paradox",["pesticide"]],
+ ["Testing that examines work products without executing the code.","Static testing",["static"]],
+ ["Static technique where tools automatically flag unreachable code or syntax violations.","Static analysis",["static analysis"]],
+ ["Most formal review type, with a moderator and formal entry/exit criteria.","Inspection",["inspection"]],
+ ["Test level that checks the smallest testable part in isolation.","Unit (component) testing",["unit","component testing"]],
+ ["Fake lower component that returns predefined data.","Stub",["stub"]],
+ ["Fake component that checks whether methods were called correctly.","Mock",["mock"]],
+ ["Fake upper caller that feeds input to the system under test.","Driver",["driver"]],
+ ["Integration approach that combines top-down and bottom-up and meets at the middle layer.","Sandwich (hybrid) integration",["sandwich","hybrid"]],
+ ["Acceptance testing by real users in their own environment, after alpha.","Beta testing",["beta"]],
+ ["Black-box technique that groups inputs processed the same way.","Equivalence Partitioning (EP)",["equivalence","ep"]],
+ ["Black-box technique that tests the edges of ordered partitions.","Boundary Value Analysis (BVA)",["boundary","bva"]],
+ ["Optional condition that must be true for a state transition to happen.","Guard (condition)",["guard"]],
+ ["Symbol/value used in a decision table to reduce the number of combinations.","“Don't care” (–)",["dont care","don t care","do not care"]],
+ ["Document describing the scope, approach, resources, and schedule of testing.","Test plan",["test plan"]],
+ ["Table linking each requirement to the test cases that verify it.","Requirements Traceability Matrix (RTM)",["rtm","traceability matrix"]],
+ ["Traceability from requirement to test cases: “Is every requirement tested?”","Forward traceability",["forward"]],
+ ["Highest level of test independence, e.g., a hired cybersecurity firm.","External / outsourced testing",["external","outsourced"]],
+ ["Standard first published in 1983 for software test documentation.","IEEE 829",["829"]]
+];
+
+// [title, source, ordered?, [[label, ...keys]]]
+const EN = [
+ ["Four categories of Cost of Quality","Lesson 1",false,[["Prevention","prevent"],["Appraisal","apprais"],["Internal failure","internal"],["External failure","external"]]],
+ ["Juran Trilogy","Lesson 1",false,[["Quality planning","plan"],["Quality control","control"],["Quality improvement","improv"]]],
+ ["Six dimensions of software quality","Lesson 1",false,[["Functionality","functional"],["Reliability","reliab"],["Usability","usab"],["Efficiency","efficien"],["Maintainability","maintain"],["Security","secur"]]],
+ ["Three categories of McCall's model","Lesson 2",false,[["Product Operation","operation"],["Product Revision","revision"],["Product Transition","transition"]]],
+ ["McCall's Product Operation factors (5)","Lesson 2",false,[["Correctness","correct"],["Efficiency","efficien"],["Integrity","integrity"],["Reliability","reliab"],["Usability","usab"]]],
+ ["McCall's Product Revision factors (3)","Lesson 2",false,[["Maintainability","maintain"],["Flexibility","flexib"],["Testability","testab"]]],
+ ["McCall's Product Transition factors (3)","Lesson 2",false,[["Portability","portab"],["Reusability","reusab"],["Interoperability","interop"]]],
+ ["ISO/IEC 25010:2023 characteristics (9)","Lesson 2",false,[["Functional Suitability","functional"],["Performance Efficiency","performance"],["Compatibility","compatib"],["Interaction Capability","interaction"],["Reliability","reliab"],["Security","secur"],["Maintainability","maintain"],["Flexibility","flexib"],["Safety","safety"]]],
+ ["CMMI maturity levels, in order","Lesson 2",true,[["Initial","initial"],["Managed","managed"],["Defined","defined"],["Quantitatively Managed","quantitative"],["Optimizing","optimi"]]],
+ ["Seven SDLC phases, in order","Lesson 3",true,[["Planning","planning"],["Requirements Analysis","requirement","analysis"],["Design","design"],["Implementation","implement","coding"],["Testing","testing"],["Deployment","deploy"],["Maintenance","mainten","maintain"]]],
+ ["Three SDLC models discussed","Lesson 3",false,[["Waterfall","waterfall"],["V-Model","v model","vmodel","v-model"],["Agile","agile"]]],
+ ["QA roles (6)","Lesson 3",false,[["QA Manager / Lead","manager","lead"],["QA Analyst","analyst"],["Manual Test Engineer","manual"],["Automation Test Engineer","automation"],["Performance Test Engineer","performance"],["UAT Coordinator","uat","coordinator"]]],
+ ["Phases of the test process (5)","Lesson 4",true,[["Test planning & control","planning"],["Test analysis & design","analysis"],["Test implementation","implement"],["Test execution","execut"],["Test completion / reporting","complet","report"]]],
+ ["Error-to-failure chain, in order","Lesson 4",true,[["Error (mistake)","error","mistake"],["Defect (fault/bug)","defect","fault","bug"],["Failure","failure"]]],
+ ["Objectives of testing (8)","Lesson 4",false,[["Evaluate work products","evaluat","work product"],["Trigger failures & find defects","trigger","find defect"],["Ensure required coverage","coverage"],["Reduce risk of poor quality","risk"],["Verify requirements are met","requirement"],["Verify compliance","complian"],["Inform stakeholder decisions","stakeholder","decision"],["Build confidence","confidence"]]],
+ ["Seven testing principles","Lesson 4",false,[["Testing shows the presence of defects","presence"],["Exhaustive testing is impossible","exhaustive"],["Early testing saves time and money","early"],["Defects cluster together","cluster"],["Beware the pesticide paradox","pesticide"],["Testing is context dependent","context"],["Absence-of-errors is a fallacy","absence","fallacy"]]],
+ ["Levels of review formality, least to most formal","Lesson 4",true,[["Informal review","informal"],["Walkthrough","walkthrough","walk through"],["Technical review","technical"],["Inspection","inspection"]]],
+ ["Levels of test independence, least to most","Lesson 4",true,[["No independence","no independence","own code"],["Within the team","within"],["Independent test team","independent test team","separate"],["Business / user community","business","user community"],["External / outsourced","external","outsourc"]]],
+ ["Four levels of testing","Lesson 5",true,[["Unit testing","unit","component"],["Integration testing","integration"],["System testing","system"],["Acceptance testing","acceptance"]]],
+ ["Four integration testing approaches","Lesson 5",false,[["Big Bang","big bang","bigbang"],["Top-Down","top down","top-down","topdown"],["Bottom-Up","bottom up","bottom-up","bottomup"],["Sandwich (Hybrid)","sandwich","hybrid"]]],
+ ["Three test doubles","Lesson 5",false,[["Stub","stub"],["Mock","mock"],["Driver","driver"]]],
+ ["Steps of system test execution (7)","Lesson 5",true,[["Plan","plan"],["Design","design"],["Prepare","prepar"],["Execute","execut"],["Report","report"],["Retest & Regress","retest","regress"],["Close","close"]]],
+ ["Five forms of acceptance testing (ISTQB)","Lesson 5",false,[["User Acceptance Testing (UAT)","uat","user acceptance"],["Operational acceptance","operational"],["Contractual & regulatory","contract","regulat"],["Alpha testing","alpha"],["Beta testing","beta"]]],
+ ["Four black-box test design techniques","Lesson 6",false,[["Equivalence Partitioning","equivalence"],["Boundary Value Analysis","boundary"],["Decision Table testing","decision"],["State Transition testing","state"]]],
+ ["Four steps of applying EP","Lesson 6",true,[["Identify the input","identify"],["Find the partitions","partition"],["Pick one value each","pick","value"],["Write test cases","write"]]],
+ ["Parts of a state transition model (5)","Lesson 6",false,[["State","state"],["Event","event"],["Transition","transition"],["Action","action"],["Guard","guard"]]],
+ ["Test plan components, IEEE 829 (16)","Lesson 7",true,[["Test Plan Identifier","identifier"],["Introduction","introduction"],["Test Items","test items","items"],["Features to Be Tested","features to be tested"],["Features Not to Be Tested","not to be tested","not tested"],["Approach","approach"],["Item Pass/Fail Criteria","pass","fail"],["Suspension & Resumption Criteria","suspension","resumption"],["Test Deliverables","deliverable"],["Testing Tasks","tasks"],["Environmental Needs","environment"],["Responsibilities","responsib"],["Staffing & Training Needs","staffing","training"],["Schedule","schedule"],["Risks & Contingencies","risk","contingenc"],["Approvals","approval"]]],
+ ["Components of a well-formed test case (12)","Lesson 7",false,[["Test Case ID","case id","tc id"],["Title / Description","title","description"],["Requirement ID","requirement"],["Module / Feature","module","feature"],["Priority","priority"],["Preconditions","precondition"],["Test Data","test data","data"],["Test Steps","steps"],["Expected Result","expected"],["Actual Result","actual"],["Status","status"],["Prepared / Executed by, Date","prepared","executed","date"]]],
+ ["Test case status values (4)","Lesson 7",false,[["Pass","pass"],["Fail","fail"],["Blocked","block"],["Not Run","not run"]]],
+ ["Three types of traceability","Lesson 7",false,[["Forward","forward"],["Backward","backward"],["Bidirectional","bidirect","bi-direct","both"]]]
+];
+
+// ---------------- HELPERS ----------------
+const $ = s => document.querySelector(s);
+const norm = s => (" "+s.toLowerCase().replace(/[’'`]/g," ").replace(/[^a-z0-9]+/g," ").trim()+" ");
+const esc = s => s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function keyHit(text,key){ // match a key as a word-prefix inside normalized text
+  const t=norm(text), k=norm(key).trim(); if(!k) return false;
+  return t.includes(" "+k);
+}
+
+// ---------------- MODES ----------------
+document.querySelectorAll(".mode-btn").forEach(b=>b.addEventListener("click",()=>{
+  document.querySelectorAll(".mode-btn").forEach(x=>x.setAttribute("aria-selected",x===b?"true":"false"));
+  ["notes","memo","practice"].forEach(m=>{$("#v-"+m).hidden = m!==b.dataset.mode});
+  window.scrollTo({top:0});
+}));
+
+// ---------------- MEMORIZE ----------------
+$("#memoGrid").innerHTML = EN.map(([t,src,ord,items])=>`<div class="card"><div class="src">${src}</div><h4>${esc(t)}</h4><${ord?"ol":"ul"}>${items.map(i=>`<li>${esc(i[0])}</li>`).join("")}</${ord?"ol":"ul"}></div>`).join("");
+
+// ---------------- PRACTICE ----------------
+const SETS = {
+  mc:{label:"Multiple choice",data:MC},
+  tf:{label:"True / False",data:TF},
+  id:{label:"Identification",data:ID},
+  en:{label:"Enumeration",data:EN},
+};
+let cur="mc", order={}, state={};
+function resetSet(k,doShuffle){ order[k]=doShuffle?shuffle(SETS[k].data.map((_,i)=>i)):SETS[k].data.map((_,i)=>i); state[k]={}; }
+Object.keys(SETS).forEach(k=>resetSet(k,false));
+
+$("#ptabs").innerHTML = Object.entries(SETS).map(([k,s])=>`<button class="ptab" role="tab" data-k="${k}" aria-selected="${k===cur}">${s.label}<span class="n">${s.data.length}</span></button>`).join("");
+$("#ptabs").addEventListener("click",e=>{const b=e.target.closest(".ptab"); if(!b) return; cur=b.dataset.k;
+  document.querySelectorAll(".ptab").forEach(x=>x.setAttribute("aria-selected",x===b?"true":"false"));
+  Object.keys(SETS).forEach(k=>{$("#q-"+k).hidden = k!==cur}); updateScore();});
+$("#shuffleBtn").onclick=()=>{resetSet(cur,true);render()};
+$("#resetBtn").onclick=()=>{resetSet(cur,false);render()};
+
+function updateScore(){
+  const st=state[cur], total=SETS[cur].data.length;
+  let pts=0, ans=0, max=0;
+  if(cur==="en"){
+    Object.values(st).forEach(v=>{ans++;pts+=v.got;max+=v.of});
+    $("#scoreTxt").innerHTML=`${pts} / ${max}<small>items · ${ans} of ${total} lists checked</small>`;
+    $("#scoreBar").style.width=(max?pts/max*100:0)+"%";
+  } else {
+    Object.values(st).forEach(v=>{ans++; if(v) pts++});
+    $("#scoreTxt").innerHTML=`${pts} / ${ans}<small>answered ${ans} of ${total}</small>`;
+    $("#scoreBar").style.width=(ans?pts/ans*100:0)+"%";
+  }
+}
+const stamp = ok => `<span class="stamp ${ok?"pass":"fail"}">${ok?"PASS":"FAIL"}</span>`;
+
+function render(){
+  const L=$("#q-"+cur), data=SETS[cur].data;
+  L.innerHTML = order[cur].map((qi,n)=>{
+    const q=data[qi], num=`<div class="qn">${String(n+1).padStart(2,"0")} · ${SETS[cur].label}</div>`;
+    if(cur==="mc") return `<div class="q" data-i="${qi}">${num}<div class="qt">${esc(q[0])}</div><div class="opts">${q[1].map((o,j)=>`<button class="opt" data-j="${j}"><span class="L">${"ABCD"[j]}</span><span>${esc(o)}</span></button>`).join("")}</div></div>`;
+    if(cur==="tf") return `<div class="q" data-i="${qi}">${num}<div class="qt">${esc(q[0])}</div><div class="tf"><button class="opt" data-v="1">True</button><button class="opt" data-v="0">False</button></div></div>`;
+    if(cur==="id") return `<div class="q" data-i="${qi}">${num}<div class="qt">${esc(q[0])}</div><form class="row idf"><input type="text" id="id-${qi}" autocomplete="off" placeholder="Type your answer"><button class="btn primary" type="submit">Check</button><button class="btn reveal" type="button">Show answer</button></form></div>`;
+    return `<div class="q" data-i="${qi}">${num}<div class="qt">${esc(q[0])} <span class="mono" style="color:var(--muted)">(${q[3].length}${q[2]?", in order":""})</span></div><p class="hint">One item per line. Spelling can be loose; the checker looks for key words.</p><textarea id="en-${qi}" placeholder="Item 1&#10;Item 2&#10;…"></textarea><div class="row" style="margin-top:8px"><button class="btn primary chk" type="button">Check list</button><button class="btn reveal" type="button">Show list</button></div><div class="enum-res"></div></div>`;
+  }).join("");
+  updateScore();
+}
+
+
+$("#qwrap").addEventListener("click",e=>{
+  const card=e.target.closest(".q"); if(!card) return; const qi=+card.dataset.i, st=state[cur];
+  if(cur==="mc"){
+    const b=e.target.closest(".opt"); if(!b||b.disabled) return;
+    const q=MC[qi], j=+b.dataset.j, ok=j===q[2];
+    card.querySelectorAll(".opt").forEach((o,k)=>{o.disabled=true; if(k===q[2]) o.classList.add("right"); else if(k===j) o.classList.add("wrong");});
+    card.insertAdjacentHTML("beforeend",stamp(ok)+`<div class="why"><b>Answer: ${"ABCD"[q[2]]}. ${esc(q[1][q[2]])}</b> ${esc(q[3])}</div>`);
+    st[qi]=ok; updateScore();
+  }
+  if(cur==="tf"){
+    const b=e.target.closest(".opt"); if(!b||b.disabled) return;
+    const q=TF[qi], v=b.dataset.v==="1", ok=v===q[1];
+    card.querySelectorAll(".opt").forEach(o=>{o.disabled=true; const ov=o.dataset.v==="1"; if(ov===q[1]) o.classList.add("right"); else if(o===b) o.classList.add("wrong");});
+    card.insertAdjacentHTML("beforeend",stamp(ok)+`<div class="why"><b>${q[1]?"True.":"False."}</b> ${esc(q[2])}</div>`);
+    st[qi]=ok; updateScore();
+  }
+  if(cur==="id" && e.target.closest(".reveal")){
+    if(card.querySelector(".why")) return;
+    const q=ID[qi]; card.insertAdjacentHTML("beforeend",`<div class="why"><b>Answer: ${esc(q[1])}</b></div>`);
+    if(!(qi in st)){st[qi]=false; card.insertAdjacentHTML("beforeend",stamp(false)); card.querySelector("input").disabled=true; updateScore();}
+  }
+  if(cur==="en" && (e.target.closest(".chk")||e.target.closest(".reveal"))){
+    const q=EN[qi], txt=card.querySelector("textarea").value, lines=txt.split(/\n|,|;/).map(s=>s.trim()).filter(Boolean);
+    const reveal=!!e.target.closest(".reveal");
+    let got=0;
+    const res=q[3].map((it,idx)=>{
+      const keys=it.length>1?it.slice(1):[it[0]];
+      let hit=lines.some(l=>keys.some(k=>keyHit(l,k)));
+      if(hit && q[2]){ const l=lines[idx]; hit = !!l && keys.some(k=>keyHit(l,k)); }
+      if(hit) got++;
+      return `<span class="it ${hit?"got":"miss"}">${q[2]?(idx+1)+". ":""}${esc(it[0])}</span>`;
+    });
+    card.querySelector(".enum-res").innerHTML = (reveal&&!txt.trim()) ? q[3].map((it,idx)=>`<span class="it got">${q[2]?(idx+1)+". ":""}${esc(it[0])}</span>`).join("") : res.join("");
+    card.querySelector(".stamp")?.remove();
+    if(!(reveal&&!txt.trim())) card.insertAdjacentHTML("beforeend",`<span class="stamp ${got===q[3].length?"pass":"fail"}">${got}/${q[3].length}</span>`);
+    st[qi]={got: reveal&&!txt.trim()?0:got, of:q[3].length}; updateScore();
+  }
+});
+$("#qwrap").addEventListener("submit",e=>{
+  e.preventDefault(); const card=e.target.closest(".q"), qi=+card.dataset.i, q=ID[qi], st=state.id;
+  const inp=card.querySelector("input"); const v=inp.value; if(!v.trim()||inp.disabled) return;
+  const ok=q[2].some(k=>keyHit(v,k));
+  inp.disabled=true; card.querySelectorAll("button").forEach(b=>b.disabled=true);
+  card.insertAdjacentHTML("beforeend",stamp(ok)+`<div class="why"><b>Answer: ${esc(q[1])}</b>${ok?"":" · You wrote: "+esc(v)}</div>`);
+  st[qi]=ok; updateScore();
+});
+
+["mc","tf","id","en"].forEach(k=>{cur=k;render()}); cur="mc"; updateScore();
+</script>
+
+</body></html>
